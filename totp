@@ -1,0 +1,10 @@
+#!/bin/bash
+SITE=`echo -e "google\nfacebook\nmicrosoft\nteamviewer" | dmenu`
+SECRET=`gpg -q --decrypt <PATH>/$SITE.gpg`
+pkill -f "^totpsleep" 2>/dev/null && sleep 0.5
+temp=$(xclip -o) || temp=""
+oathtool --base32 --totp "$SECRET" | xclip -selection -clipboard | xclip -o -selection -clipboard | xdotool type --clearmodifiers --file - 
+(
+( exec -a "totpsleep" sleep 45 )
+echo -n $temp | xclip -selection -clipboard
+) 2>/dev/null & disown
