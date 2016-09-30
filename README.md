@@ -10,4 +10,4 @@ OTP authentication with bash + dmenu [+gpg]
 # notes
 * gpg encrypt your otp secrets into a folder and replace \<FULLPATH> in line 4
 * assign a shortcut
-* auto types the generated otp to the current window and keeps the generated otp for 45 seconds (modify line 8 for desired time)
+* copies generated otp to clipboard and auto types it to the current window (if run from terminal then only copies to clipboard) and keeps the generated otp for 45 seconds (modify line 17 for desired time)
