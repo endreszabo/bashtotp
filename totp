@@ -1,13 +1,12 @@
 #!/bin/bash
-SECRETSPATH="<PATH>"
-SITESELECT=`echo -e "google\nfacebook\nmicrosoft\nteamviewer" | dmenu`
-[ -z $SITESELECT ] && echo "No site selected" 1>&2 && exit 1
-SECRETFILE="${SECRETSPATH}${SITESELECT}.gpg"
-[ ! -f "${SECRETFILE}" ] && echo "gpg encrypted secret file does not exist: $SECRETFILE" 1>&2 && exit 1
-SECRET=$(gpg -q --decrypt $SECRETFILE)
+temp=$(xclip -o 1>&2 &)
+echo -n | xclip
+SECRETSPATH="/<FULLPATH>/"
+SECRETFILE=`ls $SECRETSPATH | dmenu`
+[ ! -f "${SECRETSPATH}${SECRETFILE}" ] && echo "gpg encrypted secret file does not exist: ${SECRETSPATH}${SECRETFILE}" 1>&2 && exit 1
+SECRET=$(gpg -q --decrypt "${SECRETSPATH}${SECRETFILE}")
 [ $? != "0" ] && echo "gpg decrypt error" 1>&2 && exit 1
 pkill -f "^totpsleep" 2>/dev/null && sleep 0.5
-temp=$(xclip -o 1>&2 &) 
 oathtool --base32 --totp "$SECRET" | xclip -i
 if [[ -t 1 ]]; then
 xclip -o -selection -clipboard 
