@@ -1,7 +1,7 @@
 #!/bin/bash
 temp=$(xclip -o 1>&2 &)
 echo -n | xclip
-SECRETSPATH='/<FULLPATH>/'
+SECRETSPATH='<FULLPATH>'
 SECRETFILE=`ls $SECRETSPATH | dmenu`
 [ ! -f "${SECRETSPATH}/${SECRETFILE}" ] && echo "gpg encrypted secret file does not exist: ${SECRETSPATH}/${SECRETFILE}" 1>&2 && exit 1
 SECRET=$(gpg -q --decrypt "${SECRETSPATH}${SECRETFILE}")
