@@ -1,10 +1,20 @@
 #!/bin/bash
-SITE=`echo -e "google\nfacebook\nmicrosoft\nteamviewer" | dmenu`
-SECRET=`gpg -q --decrypt <PATH>/$SITE.gpg`
+SECRETSPATH="<PATH>"
+SITESELECT=`echo -e "google\nfacebook\nmicrosoft\nteamviewer" | dmenu`
+[ -z $SITESELECT ] && echo "No site selected" 1>&2 && exit 1
+SECRETFILE="${SECRETSPATH}${SITESELECT}.gpg"
+[ ! -f "${SECRETFILE}" ] && echo "gpg encrypted secret file does not exist: $SECRETFILE" 1>&2 && exit 1
+SECRET=$(gpg -q --decrypt $SECRETFILE)
+[ $? != "0" ] && echo "gpg decrypt error" 1>&2 && exit 1
 pkill -f "^totpsleep" 2>/dev/null && sleep 0.5
-temp=$(xclip -o) || temp=""
-oathtool --base32 --totp "$SECRET" | xclip -selection -clipboard | xclip -o -selection -clipboard | xdotool type --clearmodifiers --file - 
+temp=$(xclip -o 1>&2 &) 
+oathtool --base32 --totp "$SECRET" | xclip -i
+if [[ -t 1 ]]; then
+xclip -o -selection -clipboard 
+else
+xclip -o -selection -clipboard | xdotool type --clearmodifiers --file - 
+fi
 (
 ( exec -a "totpsleep" sleep 45 )
-echo -n $temp | xclip -selection -clipboard
+echo -n $temp | xclip
 ) 2>/dev/null & disown
